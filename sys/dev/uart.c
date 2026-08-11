@@ -145,10 +145,15 @@ void attach_uart(void * mmio_base, int irqno) {
     // register the device (to reserve the name uart0), but pass a NULL device
     // pointer, so that find_serial("uart", 0) returns NULL.
 
+    // The demo build runs on stock QEMU, which has only uart0, so the console
+    // UART has to double as an openable device there.
+
+#ifndef DEMO_CONSOLE_UART
     if (mmio_base == (void*)UART0_MMIO_BASE) {
         register_device(UART_DEVNAME, DEV_SERIAL, NULL);
         return;
     }
+#endif
     
     uart = kcalloc(1, sizeof(struct uart_serial));
 

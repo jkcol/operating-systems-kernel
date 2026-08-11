@@ -45,6 +45,18 @@ usr/     userspace — shell, user programs, syscall stubs, libc-style helpers
 util/    host tools for creating and unpacking KTFS filesystem images
 ```
 
+## Demo
+
+To watch it boot without setting up a cross toolchain, `demo/` builds the kernel
+and runs it on an unmodified `qemu-system-riscv64` inside a container:
+
+```bash
+./demo/demo.sh
+```
+
+It mounts a KTFS image off a VirtIO block device and execs a user binary out of
+it in user mode. See [demo/README.md](demo/README.md).
+
 ## Building and running
 
 Requires a RISC-V cross toolchain (`riscv64-unknown-elf-gcc`) and `qemu-system-riscv64`.

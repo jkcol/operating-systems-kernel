@@ -6,6 +6,7 @@
 *.raw
 sys/kernel
 usr/progs/*.elf
+usr/bin/
 
 # OS / editor
 .DS_Store

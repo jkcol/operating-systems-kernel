@@ -1,5 +1,4 @@
 #include <string.h>
-#include <stdlib.h>
 #include <stdint.h>
 
 #include "testsuite_1.h"

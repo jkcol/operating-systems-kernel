@@ -83,6 +83,20 @@ QEMUOPTS += -device virtio-blk-device,drive=blk0
 
 QEMUOPTS += -monitor pty
 
+# The demo build targets stock qemu-system-riscv64, whose virt machine has a
+# single UART, so uart0 doubles as the console and the user program's terminal.
+
+ifneq ($(filter demo-kernel.elf run-demo debug-demo,$(MAKECMDGOALS)),)
+CFLAGS += -DDEMO_CONSOLE_UART
+endif
+
+DEMO_QEMUOPTS = -global virtio-mmio.force-legacy=false
+DEMO_QEMUOPTS += -machine virt -bios none -nographic
+DEMO_QEMUOPTS += -object rng-random,filename=/dev/urandom,id=rng0
+DEMO_QEMUOPTS += -device virtio-rng-device,rng=rng0
+DEMO_QEMUOPTS += -drive file=ktfs.raw,id=blk0,if=none,format=raw,readonly=false
+DEMO_QEMUOPTS += -device virtio-blk-device,drive=blk0
+
 ###########################################################################
 
 all: kernel.elf
@@ -123,5 +137,16 @@ run-test: test-kernel.elf
 
 debug-test: test-kernel.elf
 	$(QEMU) $(QEMUOPTS) -m 8M -kernel $< -S -s
+
+################################DEMO_MAIN.C#################################
+
+demo-kernel.elf: $(OBJS) demo/demo_main.o blob.o
+	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
+
+run-demo: demo-kernel.elf
+	$(QEMU) $(DEMO_QEMUOPTS) -m 8M -kernel $<
+
+debug-demo: demo-kernel.elf
+	$(QEMU) $(DEMO_QEMUOPTS) -m 8M -kernel $< -S -s
 
 ###########################################################################

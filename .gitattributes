@@ -1,0 +1,3 @@
+# The demo scripts run inside a Linux container; CRLF breaks the shebang.
+*.sh text eol=lf
+demo/Dockerfile text eol=lf
