@@ -138,17 +138,26 @@ void run_init(void) {
     char* argv[] = {INITEXE, NULL};
     int result;
 
-    result = open_file(DEVMNTNAME, CONSDEVNAME, &termio);
-
-    if (result != 0) {
-        kprintf("open %s/%s: %s; terminating\n", DEVMNTNAME, CONSDEVNAME, error_name(result));
-        halt_failure();
-    }
-
     result = open_file(CMNTNAME, INITEXE, &initexe);
 
     if (result != 0) {
         kprintf("open %s/%s: %s; terminating\n", CMNTNAME, INITEXE, error_name(result));
+        halt_failure();
+    }
+
+    kprintf("[boot] exec /%s/%s in user mode\n", CMNTNAME, INITEXE);
+    kprintf("------------------------------------------------\n");
+
+    // Open the console UART *after* the last kprintf. uart0 is the polled
+    // kernel console as well as the device backing the user program's stdio,
+    // and once uart_serial_open() turns on the TX interrupt the two writers
+    // race: on a pty, where the host applies backpressure, interleaving a
+    // polled kputc with the interrupt-driven driver wedges output entirely.
+
+    result = open_file(DEVMNTNAME, CONSDEVNAME, &termio);
+
+    if (result != 0) {
+        kprintf("open %s/%s: %s; terminating\n", DEVMNTNAME, CONSDEVNAME, error_name(result));
         halt_failure();
     }
 
@@ -158,9 +167,6 @@ void run_init(void) {
     proc->uiotab[0] = termio;
     proc->uiotab[1] = termio;
     proc->uiotab[2] = termio;
-
-    kprintf("[boot] exec /%s/%s in user mode\n", CMNTNAME, INITEXE);
-    kprintf("------------------------------------------------\n");
 
     process_exec(initexe, 1, argv);
 

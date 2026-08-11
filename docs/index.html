@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RISC-V Operating System Kernel</title>
+<meta name="description" content="A Unix-like RISC-V kernel written from scratch in C and assembly, booting real games under QEMU.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>&#128421;</text></svg>">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+    <h1>A Unix-like kernel for RISC-V</h1>
+    <p class="sub">
+        Written from scratch in C and RV64 assembly &mdash; page tables, preemptive
+        scheduling, a custom filesystem, and VirtIO drivers. Below it is booting under
+        QEMU and running real games in user mode.
+    </p>
+    <div class="chips">
+        <span class="chip">rv64</span>
+        <span class="chip">Sv39 paging</span>
+        <span class="chip">preemptive multitasking</span>
+        <span class="chip">KTFS</span>
+        <span class="chip">VirtIO</span>
+        <span class="chip">ELF loader</span>
+        <span class="chip">fork / exec / wait</span>
+    </div>
+</header>
+
+<main>
+    <div class="terminal">
+        <div class="bar">
+            <span class="lights"><i></i><i></i><i></i></span>
+            <div id="tabs"></div>
+            <button id="toggle">pause</button>
+        </div>
+        <div class="screen-wrap"><pre id="screen"></pre></div>
+        <div class="track"><div id="progress"></div></div>
+    </div>
+    <p id="blurb"></p>
+
+    <section>
+        <h2>What you're looking at</h2>
+        <p>
+            These are real recordings of the kernel running, not mockups. Each one boots
+            from nothing, brings up the subsystems, mounts a filesystem off an emulated
+            disk, loads an ELF binary into a fresh address space, and drops into user mode.
+            The games are unmodified 1970s&ndash;80s BSD and Infocom programs compiled for
+            RISC-V; the kernel underneath them is the project.
+        </p>
+    </section>
+
+    <section>
+        <h2>Subsystems</h2>
+        <table>
+            <tr>
+                <th>Memory</th>
+                <td>Sv39 three-level page tables, per-process address spaces, kernel/user separation</td>
+            </tr>
+            <tr>
+                <th>Scheduling</th>
+                <td>Preemptive multitasking with timer-driven context switching</td>
+            </tr>
+            <tr>
+                <th>Traps</th>
+                <td>Exception and interrupt handling, PLIC-backed external interrupts</td>
+            </tr>
+            <tr>
+                <th>Filesystem</th>
+                <td>KTFS, a custom on-disk filesystem, with a write-back block cache</td>
+            </tr>
+            <tr>
+                <th>Syscalls</th>
+                <td><code>fork</code>, <code>exec</code>, <code>wait</code>, and I/O across the user/kernel boundary</td>
+            </tr>
+            <tr>
+                <th>Devices</th>
+                <td>VirtIO block and RNG, 16550 UART, RTC, ramdisk, behind a common device abstraction</td>
+            </tr>
+            <tr>
+                <th>Loader</th>
+                <td>ELF loader that maps user binaries into fresh address spaces</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Run it yourself</h2>
+        <p>
+            Everything above reproduces on any machine with Docker &mdash; no RISC-V
+            toolchain needed:
+        </p>
+        <table>
+            <tr>
+                <th>&nbsp;</th>
+                <td><code>git clone https://github.com/jkcol/operating-systems-kernel</code><br>
+                    <code>cd operating-systems-kernel &amp;&amp; ./demo/demo.sh</code></td>
+            </tr>
+        </table>
+        <p class="note">
+            The demo build targets a stock <code>qemu-system-riscv64</code>, which provides a
+            single UART. The kernel was written against a course-patched QEMU that had
+            several, so the demo entry point shares one UART between the kernel console and
+            the user program. Everything else is the unmodified kernel.
+        </p>
+    </section>
+</main>
+
+<footer>
+    <p>
+        Built for the Operating Systems course at the University of Illinois
+        Urbana-Champaign. Source on
+        <a href="https://github.com/jkcol/operating-systems-kernel">GitHub</a>.
+    </p>
+</footer>
+
+</div>
+<script src="player.js"></script>
+</body>
+</html>

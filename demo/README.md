@@ -29,11 +29,46 @@ Sv39 page-table setup, the VirtIO block driver, the block cache, KTFS, the ELF
 loader, the trap path, and `fork` / `wait` / `write` across the syscall
 boundary.
 
+Pick what the kernel execs at boot with `PROG`:
+
+```bash
+PROG=trek ./demo/demo.sh      # also: rogue, zork, hello (the default)
+```
+
 ## What it does
 
-`demo/build.sh` links `usr/bin/hello` into a KTFS image with `util/mkfs_ktfs`,
-builds `sys/demo-kernel.elf`, and `demo/run.sh` boots it with the image attached
-as a VirtIO block device.
+`demo/build.sh` builds a KTFS image with `util/mkfs_ktfs` containing
+`usr/bin/hello` and the three games from `usr/games/`, builds
+`sys/demo-kernel.elf`, and `demo/run.sh` boots it with the image attached as a
+VirtIO block device.
+
+## The website
+
+`docs/` is a GitHub Pages site that loops recordings of the demo. It has no
+dependencies — `docs/player.js` is a small ANSI terminal and asciicast player
+written for it, so there is no third-party JavaScript to vendor or update.
+
+To re-record after changing the kernel:
+
+```bash
+docker run --rm -v "$PWD:/src" oskernel-demo bash /src/demo/record.sh
+```
+
+That rebuilds the kernel once per program and writes `docs/casts/*.cast`. The
+scripted play-throughs live in `demo/play/`; each writes keystrokes on stdout
+with realistic delays.
+
+One constraint shapes how recording works: QEMU gets **pipes** on both ends,
+never a pty. Given a pty, the kernel's interrupt-driven UART never delivers the
+user program's output — the polled console still prints, so the boot log appears
+and then everything stops. `record.sh` therefore pipes into QEMU and pipes back
+out through `cat`, and asciinema records `cat`.
+
+To preview the site locally:
+
+```bash
+cd docs && python3 -m http.server 8000
+```
 
 ## Why a separate kernel entry point
 

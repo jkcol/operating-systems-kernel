@@ -1,3 +1,6 @@
 # The demo scripts run inside a Linux container; CRLF breaks the shebang.
 *.sh text eol=lf
 demo/Dockerfile text eol=lf
+
+# asciicast is one JSON object per line; keep the line endings the recorder wrote.
+*.cast text eol=lf

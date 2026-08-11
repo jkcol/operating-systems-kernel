@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc-riscv64-unknown-elf \
         binutils-riscv64-unknown-elf \
         qemu-system-misc \
+        asciinema \
         file \
         xxd \
         ca-certificates \
