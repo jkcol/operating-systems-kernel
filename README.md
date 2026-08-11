@@ -23,6 +23,20 @@ Built for the Operating Systems course at the University of Illinois Urbana-Cham
 `util/` contains `mkfs_ktfs` and `unmkfs_ktfs` for building and inspecting KTFS images
 from the host.
 
+## Boot path
+
+```mermaid
+flowchart TD
+    A["start.s — machine-mode entry"] --> B["main.c — kernel init"]
+    B --> C["memory.c — Sv39 page tables, kernel mapping"]
+    B --> D["intr.c / plic.c — trap vector, interrupt controller"]
+    B --> E["device.c — probe VirtIO, UART, RTC"]
+    E --> F["ktfs.c — mount filesystem over vioblk"]
+    F --> G["elf.c — load /usr shell into a fresh address space"]
+    G --> H["thread.c — schedule; timer.c drives preemption"]
+    H --> I["Interactive shell — fork / exec / wait, pipes, redirection"]
+```
+
 ## Layout
 
 ```

@@ -1,0 +1,12 @@
+# Build output
+*.o
+*.d
+*.elf
+*.img
+*.raw
+sys/kernel
+usr/progs/*.elf
+
+# OS / editor
+.DS_Store
+.vscode/
